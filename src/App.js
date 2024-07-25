@@ -1,25 +1,43 @@
 import logo from './logo.svg';
 import './App.css';
+import { Outlet } from "react-router-dom";
+import { Header } from './components/Header';
+import { SideBar } from './components/SideBar';
+import { Dashboard } from './components/Dashboard';
 
-function App() {
+import { Login } from './components/Login/Login';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { User } from './components/User';
+import React, { useState, useEffect } from 'react';
+
+export default function App() {
+  // const [token, setToken] = useState('');
+  // useEffect(() => {
+  //   // Retrieve username from localStorage on component mount
+  //   const token = localStorage.getItem('token');
+  //   if (token) {
+  //     setToken(token);
+  //   }
+  // }, []);
+
+ 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+    <>
+      <div className="bg-neutral-100 h-screen w-screen overflow-hidden flex flex-row">
+        <SideBar></SideBar>
+        <div className="flex flex-col flex-1">
+          <Header></Header>
+          <div className="flex-1 p-4 min-h-0 overflow-auto">
+            <Outlet></Outlet>
+          </div>
+        </div>
+      </div>
+    </>
+
   );
 }
 
-export default App;
+
+
+
