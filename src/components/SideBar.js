@@ -18,7 +18,7 @@ export function SideBar() {
     let token = localStorage.getItem('token');
     token = JSON.parse(token);
     let userRole = token ? token.role : '';
-
+    userRole = 'SUPERADMIN' //harcode
     if (userRole === 'SUPERADMIN') {
       setRoleArray([
         {
@@ -26,6 +26,18 @@ export function SideBar() {
           label: 'Dashboard',
           path: '/dashboard',
           icon: <HiOutlineViewGrid />
+        },
+        {
+          key: 'role',
+          label: 'Role',
+          path: '/dashboard/role',
+          icon: <HiOutlinePlusSm />
+        },
+        {
+          key: 'persmission',
+          label: 'Persmission',
+          path: '/dashboard/permission',
+          icon: <HiOutlinePlusSm />
         },
         {
           key: 'users',

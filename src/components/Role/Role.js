@@ -5,37 +5,36 @@ import DataTable from 'react-data-table-component';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
-export function User() {
-    const [users, setUsers] = useState([]);
+export function Role() {
+    const [roles, setRole] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        fetchUsers();
+        fetchRole();
     }, [currentPage, pageSize, searchTerm]); // Include searchTerm in dependencies to trigger search on change
 
-    async function fetchUsers() {
+    async function fetchRole() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`);
-            const totalUsers = response.data.length;
-            setTotalPages(Math.ceil(totalUsers / pageSize));
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`);
+            const totalRoles = response.data.length;
+            setTotalPages(Math.ceil(totalRoles / pageSize));
 
             const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = Math.min(startIndex + pageSize, totalUsers);
+            const endIndex = Math.min(startIndex + pageSize, totalRoles);
 
-            const filteredUsers = response.data.filter(user =>
-                user.Role.roleName.toLowerCase().includes(searchTerm.toLowerCase())||
-                (user.firstName + ' ' + user.lastName).toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchTerm.toLowerCase())
+            
+            const filteredRoles = response.data.filter(role =>
+                role.roleName.toLowerCase().includes(searchTerm.toLowerCase())
             );
 
 
-            const usersForCurrentPage = filteredUsers.slice(startIndex, endIndex);
-            setUsers(usersForCurrentPage);
+            const rolesForCurrentPage = filteredRoles.slice(startIndex, endIndex);
+            setRole(rolesForCurrentPage);
         } catch (error) {
-            console.error('Error fetching users:', error);
+            console.error('Error fetching role:', error);
         }
     }
 
@@ -43,66 +42,54 @@ export function User() {
         setCurrentPage(page);
     };
 
-    const handleDelete = (userId) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this user!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}`)
-                    .then(response => {
-                        Swal.fire(
-                            'Deleted!',
-                            'User has been deleted.',
-                            'success'
-                        );
-                        fetchUsers(); // Fetch updated users after deletion
-                    })
-                    .catch(error => {
-                        console.error('Error deleting user:', error);
-                        Swal.fire(
-                            'Error!',
-                            'Failed to delete user.',
-                            'error'
-                        );
-                    });
-            }
-        });
-    };
+    // const handleDelete = (roleId) => {
+    //     Swal.fire({
+    //         title: 'Are you sure?',
+    //         text: 'You will not be able to recover this role!',
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#3085d6',
+    //         cancelButtonColor: '#d33',
+    //         confirmButtonText: 'Yes, delete it!'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}`)
+    //                 .then(response => {
+    //                     Swal.fire(
+    //                         'Deleted!',
+    //                         'User has been deleted.',
+    //                         'success'
+    //                     );
+    //                     fetchUsers(); // Fetch updated users after deletion
+    //                 })
+    //                 .catch(error => {
+    //                     console.error('Error deleting user:', error);
+    //                     Swal.fire(
+    //                         'Error!',
+    //                         'Failed to delete user.',
+    //                         'error'
+    //                     );
+    //                 });
+    //         }
+    //     });
+    // };
 
     const columns = [
         {
             name: 'Role',
             selector: 'role',
             sortable: false,
-            cell: row => <div className="text-gray-600  ">{row.Role.roleName}</div>
-        },
-        {
-            name: 'Name',
-            selector: 'firstName',
-            sortable: false,
-            cell: row => <div className="text-gray-600 ">{row.firstName} {row.lastName}</div>
-        },
-        {
-            name: 'Email',
-            selector: 'email',
-            sortable: false,
-            cell: row => <div className="text-gray-600 ">{row.email}</div>
+            cell: row => <div className="text-gray-600  ">{row.roleName}</div>
         },
         {
             name: 'Actions',
             cell: row => (
                 <div className="flex">
-                <Link to={`/dashboard/adduser/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
+                <Link to={`/dashboard/addrole/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
                     <FaEdit className="text-xl" />
                 </Link>
                 <button
-                    onClick={() => handleDelete(row.id)}
+                   
                     className="text-red-500 hover:text-red-700"
                 >
                     <FaTrash className="text-xl" />
@@ -124,9 +111,9 @@ export function User() {
         <div className="container mx-auto p-4">
             <div className="container mx-auto p-4 flex items-center justify-between">
                 <h1 className="text-3xl font-bold">User </h1>
-                <Link to='/dashboard/adduser'>
+                <Link to='/dashboard/addrole'>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Add User
+                        Add Role
                     </button>
                 </Link>
             </div>
@@ -134,7 +121,7 @@ export function User() {
             <div className="mb-4">
                 <input
                     type="text"
-                    placeholder="Search by Role, Name, or Email"
+                    placeholder="Search by Role Name"
                     className="px-4 py-2 border border-gray-300 rounded-lg w-full"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -143,7 +130,7 @@ export function User() {
 
             <DataTable
                 columns={columns}
-                data={users}
+                data={roles}
                 pagination
                 paginationServer
                 paginationTotalRows={totalPages * pageSize}

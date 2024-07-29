@@ -18,11 +18,91 @@ import {Addproduct, AddProuct} from'./components/Product/Addproduct';
 import { Login } from './components/Login/Login';
 
 import { User } from './components/User';
-
+import { Role } from './components/Role/Role';
+import { Addrole } from './components/Role/Addrole';
+import { Addpermission } from './components/Permission/Addpermission';
+import { Permission } from './components/Permission/Permission';
 
 let routes = {
   public: [
     { path: '/', element: <Login /> },
+    ,
+    {
+     path: "dashboard",
+     element: <App></App>,
+    
+    
+     children: [
+      {
+        path:'/dashboard',
+        loader: () => redirect('dashboard'),
+      },
+      {
+        path:"dashboard", 
+        element:<Dashboard />
+      },
+      {
+        path: "role",
+        element: <Role />
+      },
+      {
+        path: "addrole",
+        element: <Addrole />
+      },
+      {
+        path:"addrole/:roleId",
+        element: <Addrole />
+      },
+      {
+        path: "Permission",
+        element: <Permission />
+      },
+      {
+        path: "addpermission",
+        element: <Addpermission />
+      },
+      {
+        path:"addpermission/:permissionId",
+        element:  <Addpermission />
+      },
+      {
+        path: "user",
+        element: <User />
+      },
+      {
+        path: "adduser",
+        element: <AddUser />
+      },
+      {
+        path:"adduser/:userId",
+        element: <AddUser />
+      },
+      {
+        path: "category",
+        element: <Category />
+      },
+      {
+        path:"addcategory",
+        element: <AddCatgegory />
+      },
+      {
+        path:"addcategory/:catId",
+        element: <AddCatgegory />
+      },
+      {
+        path:"product",
+        element: <Product />
+      },
+      {
+        path:"addproduct",
+        element: <Addproduct />
+      },
+      {
+        path:"addproduct/:productId",
+        element: <Addproduct />
+      },
+    ]
+  }
   ],
   SUPERADMIN: 
   [
@@ -43,6 +123,30 @@ let routes = {
       {
         path:"dashboard", 
         element:<Dashboard />
+      },
+      {
+        path: "role",
+        element: <Role />
+      },
+      {
+        path: "addrole",
+        element: <Addrole />
+      },
+      {
+        path:"addrole/:roleId",
+        element: <Addrole />
+      },
+      {
+        path: "Permission",
+        element: <Permission />
+      },
+      {
+        path: "addpermission",
+        element: <Addpermission />
+      },
+      {
+        path:"addpermission/:permissionId",
+        element:  <Addpermission />
       },
       {
         path: "user",
@@ -102,6 +206,18 @@ let routes = {
         element:<Dashboard />
       },
       {
+        path: "role",
+        element: <Role />
+      },
+      {
+        path: "addrole",
+        element: <Addrole />
+      },
+      {
+        path:"addrole/:roleId",
+        element: <Addrole />
+      },
+      {
         path: "category",
         element: <Category />
       },
@@ -139,6 +255,7 @@ const ProtectedRoute = () => {
   let token = localStorage.getItem('token');
   token = JSON.parse(token);
   let userRole ='' ;
+  userRole =  'SUPERADMIN'; //harcode
   
   const isLoggedIn = localStorage.getItem('loggedIn') === 'true'; 
   if(token)
