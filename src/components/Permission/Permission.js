@@ -19,26 +19,29 @@ export function Permission() {
 
     async function fetchPermission() {
         try {
-
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/`);
             const totalPermissions = response.data.length;
             setTotalPages(Math.ceil(totalPermissions / pageSize));
-
-            // Apply search filter
+            
             const filteredPermissions = response.data.filter(permission =>
                 permission.Module.moduleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 permission.Role.roleName.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
+          
+            const filteredAndExcludingSuperadmin = filteredPermissions.filter(permission =>
+                permission.Role.roleName.toUpperCase() !== 'SUPERADMIN'
+            );
+    
             const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = Math.min(startIndex + pageSize, totalPermissions);
-
-            const permissionsForCurrentPage = filteredPermissions.slice(startIndex, endIndex);
+            const endIndex = Math.min(startIndex + pageSize, filteredAndExcludingSuperadmin.length);
+    
+            const permissionsForCurrentPage = filteredAndExcludingSuperadmin.slice(startIndex, endIndex);
             setPermission(permissionsForCurrentPage);
         } catch (error) {
             console.error('Error fetching permission:', error);
         }
     }
+    
 
     const handleDelete = async (permissionId) => {
         try {

@@ -18,7 +18,7 @@ export function SideBar() {
     let token = localStorage.getItem('token');
     token = JSON.parse(token);
     let userRole = token ? token.role : '';
-    userRole = 'SUPERADMIN' //harcode
+
     if (userRole === 'SUPERADMIN') {
       setRoleArray([
         {
