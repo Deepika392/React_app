@@ -1,5 +1,4 @@
-// AppRouter.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { RouterProvider, createBrowserRouter, redirect } from 'react-router-dom';
 import { getPermissionByRole } from './components/common/api';
 import { Dashboard } from './components/Dashboard';

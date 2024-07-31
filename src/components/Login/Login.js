@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export function Login() {
   const navigate = useNavigate();
   localStorage.removeItem('token');
+  sessionStorage.clear();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +38,7 @@ export function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+   
     const isValid = validateForm();
 
     if (isValid) {
@@ -49,10 +50,7 @@ export function Login() {
 
         let token = response.data;
         localStorage.setItem('token', JSON.stringify(token));
-
-        setTimeout(() => {
           navigate('/dashboard');
-        }, 1000);
 
       } catch (error) {
         setLoginError('Invalid username or password');

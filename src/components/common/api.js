@@ -24,9 +24,8 @@ export async function getPermissionByRole() {
             userId : userId
         });
 
-      
         const filteredData = response.data.filter(item => item.rpath !== null && item.rpath !== undefined);
-        console.log('filteredData',filteredData);
+       
         return filteredData;
     } catch (error) {
         console.error('Error fetching getPermissionData:', error);
