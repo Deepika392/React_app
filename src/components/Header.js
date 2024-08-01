@@ -14,6 +14,8 @@ export function Header() {
 	useEffect(() => {
         const token = localStorage.getItem('token');
 
+		
+
         if (token) {
             const parsedToken = JSON.parse(token);
             const fullName = `${parsedToken.firstName} ${parsedToken.lastName}`;
@@ -22,10 +24,9 @@ export function Header() {
     }, []); 
 	const handleSignout =  () => {
 		 localStorage.removeItem('token'); // Remove token from localStorage
-		 setTimeout(() => {
-			navigate('/');
-		  }, 1000);
-	
+		 localStorage.clear();
+		 
+		 navigate('/');
 	};
 
 	return (

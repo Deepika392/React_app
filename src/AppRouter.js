@@ -108,7 +108,7 @@ const AppRouter = () => {
                 setLoading(false);
             }
         };
-
+        
         fetchRoutes();
     }, []); // No dependencies to refetch routes on role change
 

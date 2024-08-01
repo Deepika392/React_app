@@ -31,3 +31,33 @@ export async function getPermissionByRole() {
         console.error('Error fetching getPermissionData:', error);
     }
 }
+
+export async function checkModulePermission(moduleId){
+    try{
+        let token = localStorage.getItem('token');
+        token = JSON.parse(token);
+        let userId = token && token.id ? token.id : 0;
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/checkModulePermission`,{
+            userId : userId,
+            moduleId : moduleId
+        });
+      return response.data;
+    }catch (error) {
+        console.error('Error fetching checkModulePermission:', error);
+    }
+}
+
+
+export async function checkDashboardPermission(){
+    try{
+        let token = localStorage.getItem('token');
+        token = JSON.parse(token);
+        let userId = token && token.id ? token.id : 0;
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/checkDashboardPermission`,{
+            userId : userId,
+        });
+      return response.data;
+    }catch (error) {
+        console.error('Error fetching checkModulePermission:', error);
+    }
+}

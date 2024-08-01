@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { checkModulePermission } from './../common/api';
 
 export function Category() {
     const [categories, setCategories] = useState([]);
@@ -11,10 +12,31 @@ export function Category() {
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [canWrite, setCanWrite] = useState(false);
+    const [canEdit, setCanEdit] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     useEffect(() => {
-        fetchCategories();
-    }, [currentPage, pageSize, searchTerm]); // Include searchTerm in dependencies to trigger search on change
+        const fetchPermissionAndCategories = async () => {
+            try {
+                // Fetch permissions for the module
+                let moduleId = 5;
+                const permissionData = await checkModulePermission(moduleId);
+
+                // Set the write permission based on fetched permission data
+                setCanWrite(permissionData.can_write === 1);
+                setCanEdit(permissionData.can_edit === 1);
+                setCanDelete(permissionData.can_delete === 1);
+
+                // Fetch categories after setting the permission
+                await fetchCategories();
+            } catch (error) {
+                console.error('Error fetching permissions or categories:', error);
+            }
+        };
+
+        fetchPermissionAndCategories();
+    }, [currentPage, pageSize, searchTerm]);
 
     async function fetchCategories() {
         try {
@@ -72,7 +94,7 @@ export function Category() {
                         // Then delete the category
                         await deleteCategory(catId);
                     } else {
-                        // Swal.fire('Cancelled', 'Your category is safe :)', 'info');
+                        // If user cancels, do nothing
                         return false;
                     }
                 } else {
@@ -88,7 +110,6 @@ export function Category() {
             }
         } catch (error) {
             console.error('Error checking products or deleting category:', error);
-            // Show error message if something goes wrong
             Swal.fire('Error', 'There was an error processing your request.', 'error');
         }
     };
@@ -131,23 +152,28 @@ export function Category() {
             sortable: false,
             cell: row => <div className="text-gray-600">{row.categoryName}</div>
         },
-        {
+        (canEdit || canDelete) && { // Conditionally add the "Actions" column
             name: 'Actions',
             cell: row => (
                 <div className="flex">
-                    <Link to={`/dashboard/addcategory/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
-                         <FaEdit className="text-xl" />
-                    </Link>
-                    <button
-                    onClick={() => handleDelete(row.id)}
-                    className="text-red-500 hover:text-red-700"
-                >
-                    <FaTrash className="text-xl" />
-                </button>
+                    {canEdit && (
+
+                        <Link to={`/dashboard/addcategory/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
+                            <FaEdit className="text-xl" />
+                        </Link>
+                    )}
+                    {canDelete && (
+                        <button
+                            onClick={() => handleDelete(row.id)}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            <FaTrash className="text-xl" />
+                        </button>
+                    )}
                 </div>
             )
         }
-    ];
+    ].filter(column => column !== false); // Filter out any false values
 
     const customStyles = {
         headCells: {
@@ -159,14 +185,16 @@ export function Category() {
 
     return (
         <div className="container mx-auto p-4">
-         <div className="container mx-auto p-4 flex items-center justify-between">
-                <h1 className="p-4 mr-4 text-3xl font-bold">Category </h1>
+            <div className="container mx-auto p-4 flex items-center justify-between">
+                <h1 className="p-4 mr-4 text-3xl font-bold">Category</h1>
                 <div className="p-4">
-                    <Link to='/dashboard/addcategory'>
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Add Category
-                        </button>
-                    </Link>
+                    {canWrite && (
+                        <Link to='/dashboard/addcategory'>
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Add Category
+                            </button>
+                        </Link>
+                    )}
                 </div>
             </div>
 

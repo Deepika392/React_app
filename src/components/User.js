@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { checkModulePermission } from './common/api';
 
 export function User() {
     const [users, setUsers] = useState([]);
@@ -11,10 +12,30 @@ export function User() {
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [canWrite, setCanWrite] = useState(false); // Add state for permission
+    const [canEdit, setCanEdit] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     useEffect(() => {
-        fetchUsers();
-    }, [currentPage, pageSize, searchTerm]); // Include searchTerm in dependencies to trigger search on change
+        const fetchPermissionAndUsers = async () => {
+            try {
+                let moduleId = 4;
+                const permissionData = await checkModulePermission(moduleId);
+
+                // Set the write permission based on fetched permission data
+                setCanWrite(permissionData.can_write === 1);
+                setCanEdit(permissionData.can_edit === 1);
+                setCanDelete(permissionData.can_delete === 1);
+
+                // Fetch users after setting the permission
+                await fetchUsers();
+            } catch (error) {
+                console.error('Error fetching permissions or users:', error);
+            }
+        };
+
+        fetchPermissionAndUsers();
+    }, [currentPage, pageSize, searchTerm]);
 
     async function fetchUsers() {
         try {
@@ -26,11 +47,10 @@ export function User() {
             const endIndex = Math.min(startIndex + pageSize, totalUsers);
 
             const filteredUsers = response.data.filter(user =>
-                user.Role.roleName.toLowerCase().includes(searchTerm.toLowerCase())||
+                user.Role.roleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (user.firstName + ' ' + user.lastName).toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
 
             const usersForCurrentPage = filteredUsers.slice(startIndex, endIndex);
             setUsers(usersForCurrentPage);
@@ -80,37 +100,42 @@ export function User() {
             name: 'Role',
             selector: 'role',
             sortable: false,
-            cell: row => <div className="text-gray-600  ">{row.Role.roleName}</div>
+            cell: row => <div className="text-gray-600">{row.Role.roleName}</div>
         },
         {
             name: 'Name',
             selector: 'firstName',
             sortable: false,
-            cell: row => <div className="text-gray-600 ">{row.firstName} {row.lastName}</div>
+            cell: row => <div className="text-gray-600">{row.firstName} {row.lastName}</div>
         },
         {
             name: 'Email',
             selector: 'email',
             sortable: false,
-            cell: row => <div className="text-gray-600 ">{row.email}</div>
+            cell: row => <div className="text-gray-600">{row.email}</div>
         },
-        {
+        (canEdit || canDelete) && { // Conditionally add the "Actions" column
             name: 'Actions',
             cell: row => (
                 <div className="flex">
-                <Link to={`/dashboard/adduser/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
-                    <FaEdit className="text-xl" />
-                </Link>
-                <button
-                    onClick={() => handleDelete(row.id)}
-                    className="text-red-500 hover:text-red-700"
-                >
-                    <FaTrash className="text-xl" />
-                </button>
-            </div>
+                    {canEdit && (
+
+                        <Link to={`/dashboard/adduser/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
+                            <FaEdit className="text-xl" />
+                        </Link>
+                    )}
+                    {canDelete && (
+                        <button
+                            onClick={() => handleDelete(row.id)}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            <FaTrash className="text-xl" />
+                        </button>
+                    )}
+                </div>
             )
         }
-    ];
+    ].filter(column => column !== false); // Filter out any false values
 
     const customStyles = {
         headCells: {
@@ -123,12 +148,14 @@ export function User() {
     return (
         <div className="container mx-auto p-4">
             <div className="container mx-auto p-4 flex items-center justify-between">
-                <h1 className="text-3xl font-bold">User </h1>
+                <h1 className="text-3xl font-bold">User</h1>
+                {canWrite && (
                 <Link to='/dashboard/adduser'>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Add User
                     </button>
                 </Link>
+                )}
             </div>
 
             <div className="mb-4">

@@ -38,7 +38,8 @@ export function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
+    localStorage.removeItem('token'); 
+    localStorage.clear();
     const isValid = validateForm();
 
     if (isValid) {
@@ -49,7 +50,11 @@ export function Login() {
         });
 
         let token = response.data;
+        token.refresh = false;
+        console.log('token',token);
         localStorage.setItem('token', JSON.stringify(token));
+
+      
           navigate('/dashboard');
 
       } catch (error) {

@@ -23,6 +23,8 @@ let dashboardLinks = [{
 }];
 
   useEffect(() => {
+
+ 
     const fetchPermissions = async () => {
       try {
         const permissions = await getPermissionByRole();
