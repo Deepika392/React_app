@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { checkModulePermission } from './../common/api'; 
 
 export function Permission() {
     const [permissions, setPermission] = useState([]);
@@ -11,11 +12,26 @@ export function Permission() {
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [canWrite, setCanWrite] = useState(false); 
+    const [canEdit, setCanEdit] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     useEffect(() => {
+        checkPermission();
         fetchPermission();
     }, [currentPage, pageSize, searchTerm]);
+
+    async function checkPermission() {
+        try {
+            let moduleId = 3;
+            const permissionData = await checkModulePermission(moduleId);
+            setCanWrite(permissionData.can_write === 1);
+            setCanEdit(permissionData.can_edit === 1);
+            setCanDelete(permissionData.can_delete === 1);
+        } catch (error) {
+            console.error('Error fetching permission data:', error);
+        }
+    }
 
     async function fetchPermission() {
         try {
@@ -42,7 +58,6 @@ export function Permission() {
         }
     }
     
-
     const handleDelete = async (permissionId) => {
         try {
             const result = await Swal.fire({
@@ -102,22 +117,39 @@ export function Permission() {
             cell: row => <div className="text-gray-600">{row.can_write ? 'Yes' : 'No'}</div>
         },
         {
+            name: 'Can Edit',
+            selector: 'can_edit',
+            sortable: false,
+            cell: row => <div className="text-gray-600">{row.can_edit ? 'Yes' : 'No'}</div>
+        },
+        {
+            name: 'Can Delete',
+            selector: 'can_delete',
+            sortable: false,
+            cell: row => <div className="text-gray-600">{row.can_delete ? 'Yes' : 'No'}</div>
+        },
+        (canEdit || canDelete) && { // Conditionally add the "Actions" column
             name: 'Actions',
             cell: row => (
                 <div className="flex">
-                    <Link to={`/dashboard/addpermission/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
-                        <FaEdit className="text-xl" />
-                    </Link>
-                    <button
-                        onClick={() => handleDelete(row.id)}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        <FaTrash className="text-xl" />
-                    </button>
+                    {canEdit && (
+
+                        <Link to={`/dashboard/addpermission/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
+                            <FaEdit className="text-xl" />
+                        </Link>
+                    )}
+                    {canDelete && (
+                        <button
+                            onClick={() => handleDelete(row.id)}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            <FaTrash className="text-xl" />
+                        </button>
+                    )}
                 </div>
             )
         }
-    ];
+    ].filter(column => column !== false); // Filter out any false values
 
     const customStyles = {
         headCells: {
@@ -138,11 +170,13 @@ export function Permission() {
             <div className="container mx-auto p-4 flex items-center justify-between">
                 <h1 className="p-4 mr-4 text-3xl font-bold">Permission</h1>
                 <div className="p-4">
+                {canWrite && (
                     <Link to='/dashboard/addpermission'>
                         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Add Permission
                         </button>
                     </Link>
+                )}
                 </div>
             </div>
 

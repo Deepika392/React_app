@@ -4,21 +4,42 @@ import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { checkModulePermission } from './../common/api';
 
 export function Product() {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
+    const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE));
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [canWrite, setCanWrite] = useState(false); // State for write permission
+    const [canEdit, setCanEdit] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     useEffect(() => {
-        fetchProducts();
-    }, [currentPage, pageSize, searchTerm]); // Include searchTerm in dependencies to trigger search on change
+        const fetchPermissionAndProducts = async () => {
+            try {
+                // Fetch permissions for the module
+                let moduleId = 6;
+                const permissionData = await checkModulePermission(moduleId);
+                
+                // Set the write permission based on fetched permission data
+                setCanWrite(permissionData.can_write === 1);
+                setCanEdit(permissionData.can_edit === 1);
+                setCanDelete(permissionData.can_delete === 1);
+                
+                // Fetch products after setting the permission
+                await fetchProducts();
+            } catch (error) {
+                console.error('Error fetching permissions or products:', error);
+            }
+        };
+
+        fetchPermissionAndProducts();
+    }, [currentPage, pageSize, searchTerm]);
 
     async function fetchProducts() {
         try {
-            
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/`);
             const totalProducts = response.data.length;
             setTotalPages(Math.ceil(totalProducts / pageSize));
@@ -57,7 +78,6 @@ export function Product() {
             });
 
             if (result.isConfirmed) {
-          
                 await axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`);
                 Swal.fire(
                     'Deleted!',
@@ -87,13 +107,13 @@ export function Product() {
                         <img
                             src={`${process.env.REACT_APP_IMAGE_URL}/${row.image}`}
                             alt={row.productName}
-                            className="w-16 h-16  mr-4  mt-4"
+                            className="w-16 h-16 mr-4 mt-4"
                         />
                     ) : (
                         <img
                             src={`${process.env.REACT_APP_IMAGE_URL}/no_image.png`}
                             alt={row.productName}
-                            className="w-16 h-16 mt-4  mr-4"
+                            className="w-16 h-16 mt-4 mr-4"
                         />
                     )}
                 </div>
@@ -123,23 +143,28 @@ export function Product() {
             sortable: false,
             cell: row => <div className="text-gray-600">{row.price}</div>
         },
-        {
+        (canEdit || canDelete) && { // Conditionally add the "Actions" column
             name: 'Actions',
             cell: row => (
                 <div className="flex">
-                    <Link to={`/dashboard/addproduct/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
-                        <FaEdit className="text-xl" />
-                    </Link>
-                    <button
-                        onClick={() => handleDelete(row.id)}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        <FaTrash className="text-xl" />
-                    </button>
+                    {canEdit && (
+
+                        <Link to={`/dashboard/addproduct/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
+                            <FaEdit className="text-xl" />
+                        </Link>
+                    )}
+                    {canDelete && (
+                        <button
+                            onClick={() => handleDelete(row.id)}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            <FaTrash className="text-xl" />
+                        </button>
+                    )}
                 </div>
             )
         }
-    ];
+    ].filter(column => column !== false); // Filter out any false values
 
     const customStyles = {
         headCells: {
@@ -154,11 +179,13 @@ export function Product() {
             <div className="container mx-auto p-4 flex items-center justify-between">
                 <h1 className="p-4 mr-4 text-3xl font-bold">Products</h1>
                 <div className="p-4">
+                {canWrite && (
                     <Link to='/dashboard/addproduct'>
                         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Add Product
                         </button>
                     </Link>
+                )}
                 </div>
             </div>
 

@@ -8,6 +8,8 @@ export function Addpermission() {
     const [moduleId, setModuleId] = useState('');
     const [canRead, setCanRead] = useState(false);
     const [canWrite, setCanWrite] = useState(false);
+    const [canEdit, setCanEdit] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
     const [roles, setRoles] = useState([]);
     const [modules, setModules] = useState([]);
     const [errors, setErrors] = useState({});
@@ -46,7 +48,8 @@ export function Addpermission() {
             console.error('Error fetching modules:', error);
         }
     };
-    const fetchPermission = async()=>{
+
+    const fetchPermission = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`);
             // setModules(response.data);
@@ -58,11 +61,13 @@ export function Addpermission() {
     const getPermission = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`);
-            const { roleId, moduleId, can_read, can_write } = response.data;
+            const { roleId, moduleId, can_read, can_write,can_edit,can_delete } = response.data;
             setRoleId(roleId);
             setModuleId(moduleId);
-            setCanRead(can_read === 1); // Assuming 1 means true
-            setCanWrite(can_write === 1); // Assuming 1 means true
+            setCanRead(can_read === 1); // 1 means true
+            setCanWrite(can_write === 1); // 1 means true
+            setCanEdit(can_edit === 1); 
+            setCanDelete(can_delete === 1); 
         } catch (error) {
             console.error('Error fetching permission:', error);
         }
@@ -91,9 +96,12 @@ export function Addpermission() {
                 moduleId,
                 can_read: canRead ? 1 : 0,
                 can_write: canWrite ? 1 : 0,
+                can_edit: canEdit ? 1 : 0,
+                can_delete : canDelete ? 1 : 0
+
             });
 
-            if (response.status === 201) { // Check for correct status code
+            if (response.status === 201) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Permission Added',
@@ -131,10 +139,12 @@ export function Addpermission() {
                 moduleId,
                 can_read: canRead ? 1 : 0,
                 can_write: canWrite ? 1 : 0,
+                can_edit: canEdit ? 1 : 0,
+                can_delete : canDelete ? 1 : 0
             };
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`, updateData);
 
-            if (response.status === 200) { // Check for correct status code
+            if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Permission Updated',
@@ -223,17 +233,45 @@ export function Addpermission() {
                         </label>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="inline-flex items-center text-gray-700 text-sm font-bold">
-                            <input
-                                type="checkbox"
-                                checked={canWrite}
-                                onChange={(e) => setCanWrite(e.target.checked)}
-                                className="form-checkbox text-blue-600"
-                            />
-                            <span className="ml-2">Can Write</span>
-                        </label>
-                    </div>
+                    {canRead && (
+                        <>
+                            <div className="mb-4">
+                                <label className="inline-flex items-center text-gray-700 text-sm font-bold">
+                                    <input
+                                        type="checkbox"
+                                        checked={canWrite}
+                                        onChange={(e) => setCanWrite(e.target.checked)}
+                                        className="form-checkbox text-blue-600"
+                                    />
+                                    <span className="ml-2">Can Write</span>
+                                </label>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="inline-flex items-center text-gray-700 text-sm font-bold">
+                                    <input
+                                        type="checkbox"
+                                        checked={canEdit}
+                                        onChange={(e) => setCanEdit(e.target.checked)}
+                                        className="form-checkbox text-blue-600"
+                                    />
+                                    <span className="ml-2">Can Edit</span>
+                                </label>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="inline-flex items-center text-gray-700 text-sm font-bold">
+                                    <input
+                                        type="checkbox"
+                                        checked={canDelete}
+                                        onChange={(e) => setCanDelete(e.target.checked)}
+                                        className="form-checkbox text-blue-600"
+                                    />
+                                    <span className="ml-2">Can Delete</span>
+                                </label>
+                            </div>
+                        </>
+                    )}
 
                     <div className="flex items-center space-x-4">
                         <button
