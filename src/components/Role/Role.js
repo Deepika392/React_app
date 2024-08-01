@@ -95,36 +95,68 @@ export function Role() {
         },
     };
 
-    const handleDelete = (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
+    const handleDelete = async (id) => {
+        try {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            });
+    
+         
             if (result.isConfirmed) {
-                axios.delete(`${process.env.REACT_APP_API_URL}/role/${id}`)
-                    .then(() => {
-                        Swal.fire(
-                            'Deleted!',
-                            'Your role has been deleted.',
-                            'success'
-                        );
-                        fetchRole(); // Refresh roles after deletion
-                    })
-                    .catch(error => {
-                        console.error('Error deleting role:', error);
-                        Swal.fire(
-                            'Error!',
-                            'There was an error deleting the role.',
-                            'error'
-                        );
-                    });
+                // Fetch the permissions associated with the role
+                let  permissions = await axios.get(`${process.env.REACT_APP_API_URL}/permission/role/${id}`);
+
+              
+                
+                // Check if the role is associated with any users
+                let roleDetails  = await axios.get(`${process.env.REACT_APP_API_URL}/user/role/${id}`);
+                console.log('roleDetails',roleDetails);
+                if ( roleDetails && roleDetails.data && roleDetails.data.length > 0) {
+                    console.log('');
+                    Swal.fire(
+                        'Error!',
+                        'This role is associated with users and cannot be deleted.',
+                        'error'
+                    );
+                    return; // Abort deletion
+                }
+    
+                // Delete permissions if they exist
+                if (permissions && permissions.data && permissions.data.length > 0) {
+                    await deletePermissions(permissions.data.map(permission => permission.id));
+                }
+    
+                // Delete the role
+                await axios.delete(`${process.env.REACT_APP_API_URL}/role/${id}`);
+    
+                // Notify the user of success
+                await Swal.fire('Deleted!', 'Your role and associated permissions have been deleted.', 'success');
+    
+                // Refresh roles after deletion
+                fetchRole();
             }
-        });
+        } catch (error) {
+            console.error('Error::', error);
+            Swal.fire('Error!', 'There was an error deleting the role and/or permissions.', 'error');
+        }
+    };
+    
+    const deletePermissions = async (permissions) => {
+        try {
+            console.log('in deletePersimsiion bulk');
+            const deleteRequests = permissions.map(permissionId => axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`));
+            await Promise.all(deleteRequests);
+        } catch (error) {
+            console.error('Error deletePermissions:', error);
+            Swal.fire('Error', 'Failed to deletePermissions.', 'error');
+        }
     };
 
     return (
