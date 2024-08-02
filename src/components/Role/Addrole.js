@@ -11,8 +11,13 @@ export function  Addrole() {
 
   const validateForm = () => {
     let errors = {};
+    let formIsValid = true;
     if (!roleName.trim()) {
         errors.roleName = 'Role Name is required';
+        formIsValid = false;
+    }if (roleName && roleName.length > 100) {
+        errors.roleName = "Role name must be less than 100 characters";
+        formIsValid = false;
     }
     
     setErrors(errors);
@@ -109,7 +114,7 @@ const updateRole = async (roleId) => {
     <div className="container mx-auto p-4">
     <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={collectData}>
     
-        <div className="mb-4">
+        <div className="relative mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstname">
             Role Name
             </label>
@@ -118,9 +123,12 @@ const updateRole = async (roleId) => {
                 id="rolename"
                 type="text"
                 value={roleName}
-                placeholder="Enter role name"
+                placeholder="Enter role name" maxLength={100}
                 onChange={(e) => setRoleName(e.target.value)}
             />
+              <p className="absolute top-1 right-0 text-gray-600 text-xs mt-1 mr-3">
+                            {roleName.length}/100  
+            </p>
             {errors.roleName && <p className="text-red-500 text-xs italic">{errors.roleName}</p>}
         </div>
         <div className="flex items-center space-x-4">
@@ -133,7 +141,7 @@ const updateRole = async (roleId) => {
                     <button
                         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="button"
-                        onClick={() => navigate("/dashboard/user")}
+                        onClick={() => navigate("/dashboard/role")}
                     >
                         Close
                     </button>

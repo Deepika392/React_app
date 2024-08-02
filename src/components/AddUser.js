@@ -51,17 +51,25 @@ export function AddUser() {
         let errors = {};
         if (!firstname.trim()) {
             errors.firstname = 'First Name is required';
+        } else if (firstname.length > 50) {
+            errors.firstname = 'First Name cannot exceed 50 characters';
         }
         if (!lastname.trim()) {
             errors.lastname = 'Last Name is required';
+        } else if (lastname.length > 50) {
+            errors.lastname = 'Last Name cannot exceed 50 characters';
         }
         if (!email.trim()) {
             errors.email = 'Email is required';
+        } else if (email.length > 60) {
+            errors.email = 'Email cannot exceed 60 characters';
         } else if (!/\S+@\S+\.\S+/.test(email)) {
             errors.email = 'Email is invalid';
         }
         if (!username.trim()) {
-            errors.username = 'User name is required';
+            errors.username = 'User Name is required';
+        } else if (username.length > 50) {
+            errors.username = 'User Name cannot exceed 50 characters';
         }
         if (!roleId) {
             errors.roleId = 'Role is required';
@@ -145,7 +153,7 @@ export function AddUser() {
     return (
         <div className="container mx-auto p-4">
             <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={collectData}>
-                <div className="mb-4">
+                <div className="mb-4 relative">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstname">
                         First Name
                     </label>
@@ -156,10 +164,14 @@ export function AddUser() {
                         value={firstname}
                         placeholder="Enter first name"
                         onChange={(e) => setFirstname(e.target.value)}
+                        maxLength="50" // Restrict input length
                     />
+                    <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                        {firstname.length}/50
+                    </p>
                     {errors.firstname && <p className="text-red-500 text-xs italic">{errors.firstname}</p>}
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 relative">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastname">
                         Last Name
                     </label>
@@ -170,10 +182,14 @@ export function AddUser() {
                         value={lastname}
                         placeholder="Enter last name"
                         onChange={(e) => setLastname(e.target.value)}
+                        maxLength="50" // Restrict input length
                     />
+                    <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                        {lastname.length}/50
+                    </p>
                     {errors.lastname && <p className="text-red-500 text-xs italic">{errors.lastname}</p>}
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 relative">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
                         User Name
                     </label>
@@ -184,10 +200,14 @@ export function AddUser() {
                         value={username}
                         placeholder="Enter user name"
                         onChange={(e) => setUsername(e.target.value)}
+                        maxLength="50" // Restrict input length
                     />
+                    <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                        {username.length}/50
+                    </p>
                     {errors.username && <p className="text-red-500 text-xs italic">{errors.username}</p>}
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 relative">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                         Email Address
                     </label>
@@ -198,7 +218,11 @@ export function AddUser() {
                         value={email}
                         placeholder="Enter email address"
                         onChange={(e) => setEmail(e.target.value)}
+                        maxLength="60" // Restrict input length
                     />
+                    <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                        {email.length}/60
+                    </p>
                     {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
                 </div>
 

@@ -20,13 +20,11 @@ export function Addproduct() {
 
     const { productId } = useParams();
 
-
     useEffect(() => {
         if (productId) {
             fetchProduct(productId);
         }
         fetchCategory();
-
     }, [productId]);
 
     async function fetchCategory() {
@@ -52,9 +50,7 @@ export function Addproduct() {
             if (response.data.image) {
                 const imageUrl = `${process.env.REACT_APP_IMAGE_URL}/${response.data.image}`;
                 setImagePreview(imageUrl);
-                
             }
-
         } catch (error) {
             console.error('Error fetching product:', error);
         }
@@ -71,14 +67,14 @@ export function Addproduct() {
 
         if (!productname.trim()) {
             errors.productname = "Product name is required";
+        } else if (productname.length > 100) {
+            errors.productname = "Product name cannot exceed 100 characters";
         }
-
-        // if (!image) {
-        //     errors.image = "Image is required";
-        // }
 
         if (!description.trim()) {
             errors.description = "Description is required";
+        } else if (description.length > 250) {
+            errors.description = "Description cannot exceed 250 characters";
         }
 
         if (!price) {
@@ -87,14 +83,12 @@ export function Addproduct() {
             errors.price = "Price must be a number";
         }
 
-
         if (!selectedOption) {
             errors.selectedOption = "Category is required";
         }
 
         setErrors(errors);
 
-        // Return true if no errors, false if there are errors
         return Object.keys(errors).length === 0;
     };
 
@@ -112,10 +106,8 @@ export function Addproduct() {
         }
     }
 
-
     async function addproduct() {
         try {
-
             const formData = new FormData();
             formData.append('productName', productname);
             formData.append('description', description);
@@ -124,12 +116,12 @@ export function Addproduct() {
             if (image) {
                 formData.append('image', image);
             }
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/product`, formData,{
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/product`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            if (response.statusText == "Created") {
+            if (response.statusText === "Created") {
                 Swal.fire({
                     icon: 'success',
                     title: 'Product Added',
@@ -137,7 +129,6 @@ export function Addproduct() {
                 }).then(() => {
                     navigate("/dashboard/product");
                 });
-
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -145,7 +136,6 @@ export function Addproduct() {
                     text: 'Something went wrong! Please try again later.',
                 });
             }
-
         } catch (error) {
             console.error('Error:', error);
         }
@@ -153,7 +143,6 @@ export function Addproduct() {
 
     async function updateProduct(productId) {
         try {
-
             const formData = new FormData();
             formData.append('productName', productname);
             formData.append('description', description);
@@ -162,12 +151,12 @@ export function Addproduct() {
             if (image) {
                 formData.append('image', image);
             }
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/product/${productId}`, formData,{
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/product/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            if (response.statusText == "OK") {
+            if (response.statusText === "OK") {
                 Swal.fire({
                     icon: 'success',
                     title: 'Product updated',
@@ -175,15 +164,13 @@ export function Addproduct() {
                 }).then(() => {
                     navigate("/dashboard/product");
                 });
-            }
-            else {
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong! Please try again later.',
                 });
             }
-
         } catch (error) {
             console.error('Error:', error);
         }
@@ -193,18 +180,25 @@ export function Addproduct() {
         <>
             <div className="container mx-auto p-4">
                 <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={collectData}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productrname">
+                    <div className="relative mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productname">
                             Product Name
                         </label>
-                        <input
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.productname ? 'border-red-500' : ''}`}
-                            id="productrname"
-                            type="text" value={productname}
-                            placeholder="Enter product name" onChange={(e) => setProductname(e.target.value)}
-
-                        />
-
+                        <div className="relative">
+                            <input
+                                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.productname ? 'border-red-500' : ''}`}
+                                id="productname"
+                                type="text"
+                                value={productname}
+                                placeholder="Enter product name"
+                                onChange={(e) => setProductname(e.target.value)}
+                                maxLength="100" // Restrict input length
+                            />
+                           
+                        </div>
+                        <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                                {productname.length}/100 characters
+                            </p>
                         {errors.productname && <p className="text-red-500 text-xs italic">{errors.productname}</p>}
                     </div>
                     {imagePreview && (
@@ -219,22 +213,32 @@ export function Addproduct() {
                         <input
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="image"
-                            type="file" onChange={handleImageChange}
+                            type="file"
+                            onChange={handleImageChange}
                         />
                         {/* {errors.image && (
                             <p className="text-red-500 text-xs italic">{errors.image}</p>
                         )} */}
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastname">
+                    <div className="relative mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
                             Description
                         </label>
-                        <input
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.description ? 'border-red-500' : ''}`}
-                            id="description"
-                            type="text" value={description}
-                            placeholder="Enter Description" onChange={(e) => setDescription(e.target.value)}
-                        />
+                        <div className="relative">
+                            <input
+                                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.description ? 'border-red-500' : ''}`}
+                                id="description"
+                                type="text"
+                                value={description}
+                                placeholder="Enter Description"
+                                onChange={(e) => setDescription(e.target.value)}
+                                maxLength="250" // Restrict input length
+                            />
+                          
+                        </div>
+                        <p className="absolute top-0 right-0 text-gray-600 text-xs mt-2 mr-3">
+                                {description.length}/250 characters
+                            </p>
                         {errors.description && <p className="text-red-500 text-xs italic">{errors.description}</p>}
                     </div>
                     <div className="mb-4">
@@ -244,8 +248,10 @@ export function Addproduct() {
                         <input
                             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.price ? 'border-red-500' : ''}`}
                             id="price"
-                            type="number" value={price}
-                            placeholder="Enter Price" onChange={(e) => setPrice(e.target.value)}
+                            type="number"
+                            value={price}
+                            placeholder="Enter Price"
+                            onChange={(e) => setPrice(e.target.value)}
                         />
                         {errors.price && <p className="text-red-500 text-xs italic">{errors.price}</p>}
                     </div>
@@ -254,7 +260,9 @@ export function Addproduct() {
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
                             Category
                         </label>
-                        <select value={selectedOption} onChange={handleSelectChange}
+                        <select
+                            value={selectedOption}
+                            onChange={handleSelectChange}
                             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.selectedOption ? 'border-red-500' : ''}`}
                         >
                             <option value="">Select an option</option>
@@ -269,7 +277,7 @@ export function Addproduct() {
                         )}
                     </div>
 
-                    <div className="flex items-center  space-x-4">
+                    <div className="flex items-center space-x-4">
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4"
                             type="submit"
@@ -284,12 +292,8 @@ export function Addproduct() {
                             Close
                         </button>
                     </div>
-
-
                 </form>
             </div>
-
-
         </>
     )
 }
