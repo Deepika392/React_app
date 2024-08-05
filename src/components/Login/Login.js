@@ -38,24 +38,21 @@ export function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('token');
     localStorage.clear();
     const isValid = validateForm();
 
     if (isValid) {
       try {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
           username,
           password
         });
 
         let token = response.data;
         token.refresh = false;
-        console.log('token',token);
         localStorage.setItem('token', JSON.stringify(token));
-
-      
-          navigate('/dashboard');
+        navigate('/dashboard');
 
       } catch (error) {
         setLoginError('Invalid username or password');

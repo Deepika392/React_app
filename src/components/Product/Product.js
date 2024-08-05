@@ -3,7 +3,7 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api';
 
 export function Product() {
@@ -146,7 +146,11 @@ export function Product() {
         (canEdit || canDelete) && { // Conditionally add the "Actions" column
             name: 'Actions',
             cell: row => (
-                <div className="flex">
+                
+                <div className="flex ">
+                      <Link to={`/dashboard/productview/${row.id}`} className='mr-2 text-blue-500 hover:text-blue-700'>
+                         <FaEye className="text-gray-600 text-2xl" />
+                     </Link>
                     {canEdit && (
 
                         <Link to={`/dashboard/addproduct/${row.id}`} className="mr-2 text-blue-500 hover:text-blue-700">
@@ -161,7 +165,9 @@ export function Product() {
                             <FaTrash className="text-xl" />
                         </button>
                     )}
+                   
                 </div>
+                
             )
         }
     ].filter(column => column !== false); // Filter out any false values

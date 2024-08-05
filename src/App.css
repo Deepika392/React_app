@@ -63,3 +63,7 @@
 .pagination button.active {
   background-color: #3B82F6
 }
+
+.custom-quill-editor .ql-container {
+  height: 200px; /* Adjust the height  needed */
+}

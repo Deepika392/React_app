@@ -15,6 +15,7 @@ import { Addpermission } from './components/Permission/Addpermission';
 import { Permission } from './components/Permission/Permission';
 import { ModuleAccess } from './components/ModuleAccess';
 import App from './App';
+import { ProductView } from './components/Product/ProductView';
 
 const AppRouter = () => {
     const [router, setRouter] = useState(null);
@@ -61,6 +62,7 @@ const AppRouter = () => {
                             case 'product': element = <Product />; break;
                             case 'addproduct': element = <Addproduct />; break;
                             case 'addproduct/:productId': element = <Addproduct />; break;
+                            case 'productview/:productId': element = <ProductView />; break;
                             default: element = <ModuleAccess />;
                         }
                     } else {

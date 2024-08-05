@@ -54,7 +54,7 @@ export function Addpermission() {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`);
             // setModules(response.data);
         } catch (error) {
-            console.error('Error fetching modules:', error);
+            console.error('Error fetchPermission:', error);
         }
     }
 
@@ -174,7 +174,7 @@ export function Addpermission() {
             });
         }
     }
-
+   
     return (
         <div className="w-full min-h-screen bg-gray-100 p-4">
             <div className="container max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mb-4">

@@ -113,11 +113,8 @@ export function Role() {
                 // Fetch the permissions associated with the role
                 let  permissions = await axios.get(`${process.env.REACT_APP_API_URL}/permission/role/${id}`);
 
-              
-                
                 // Check if the role is associated with any users
                 let roleDetails  = await axios.get(`${process.env.REACT_APP_API_URL}/user/role/${id}`);
-                console.log('roleDetails',roleDetails);
                 if ( roleDetails && roleDetails.data && roleDetails.data.length > 0) {
                     console.log('');
                     Swal.fire(
@@ -150,7 +147,7 @@ export function Role() {
     
     const deletePermissions = async (permissions) => {
         try {
-            console.log('in deletePersimsiion bulk');
+            //deletePersimsiion bulk
             const deleteRequests = permissions.map(permissionId => axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`));
             await Promise.all(deleteRequests);
         } catch (error) {

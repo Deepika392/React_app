@@ -10,11 +10,8 @@ export default function App() {
   	let token = localStorage.getItem('token');
     token = JSON.parse(token);
     if (!token.refresh) {
-        console.log('hasReloaded',token.refresh);
-      
         token.refresh = true;
         localStorage.setItem('token', JSON.stringify(token));
-      
         window.location.reload();
     }
     

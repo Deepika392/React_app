@@ -39,6 +39,7 @@ export function Category() {
     }, [currentPage, pageSize, searchTerm]);
 
     async function fetchCategories() {
+        console.log('11111111111111');
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/category`);
             const totalCategories = response.data.length;
