@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
 export function Addpermission() {
+    let authToken = localStorage.getItem('authToken')
     const [roleId, setRoleId] = useState('');
     const [moduleId, setModuleId] = useState('');
     const [canRead, setCanRead] = useState(false);
@@ -33,7 +34,12 @@ export function Addpermission() {
 
     const getRoles = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role` ,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             setRoles(response.data);
         } catch (error) {
             console.error('Error fetching roles:', error);
@@ -42,7 +48,12 @@ export function Addpermission() {
 
     const getModules = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             setModules(response.data);
         } catch (error) {
             console.error('Error fetching modules:', error);
@@ -51,7 +62,12 @@ export function Addpermission() {
 
     const fetchPermission = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/module`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             // setModules(response.data);
         } catch (error) {
             console.error('Error fetchPermission:', error);
@@ -60,7 +76,12 @@ export function Addpermission() {
 
     const getPermission = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/${permissionId}` ,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const { roleId, moduleId, can_read, can_write,can_edit,can_delete } = response.data;
             setRoleId(roleId);
             setModuleId(moduleId);
@@ -99,6 +120,11 @@ export function Addpermission() {
                 can_edit: canEdit ? 1 : 0,
                 can_delete : canDelete ? 1 : 0
 
+            } ,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
             });
 
             if (response.status === 201) {
@@ -142,7 +168,12 @@ export function Addpermission() {
                 can_edit: canEdit ? 1 : 0,
                 can_delete : canDelete ? 1 : 0
             };
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`, updateData);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`, updateData, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
 
             if (response.status === 200) {
                 Swal.fire({

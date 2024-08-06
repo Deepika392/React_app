@@ -49,9 +49,16 @@ export function Login() {
           password
         });
 
+
         let token = response.data;
+       
+        
         token.refresh = false;
+        let authToken =  response.data.token 
+        
         localStorage.setItem('token', JSON.stringify(token));
+        localStorage.setItem('authToken', authToken);
+        
         navigate('/dashboard');
 
       } catch (error) {

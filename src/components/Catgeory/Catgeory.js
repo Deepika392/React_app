@@ -7,6 +7,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api';
 
 export function Category() {
+    let authToken = localStorage.getItem('authToken')
     const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
@@ -39,9 +40,14 @@ export function Category() {
     }, [currentPage, pageSize, searchTerm]);
 
     async function fetchCategories() {
-        console.log('11111111111111');
+     
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/category`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/category`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const totalCategories = response.data.length;
             setTotalPages(Math.ceil(totalCategories / pageSize));
 
@@ -76,7 +82,12 @@ export function Category() {
 
             if (result.isConfirmed) {
                 // Check if there are products associated with this category
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/category/${catId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/category/${catId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 if (response.data.length > 0) {
                     // If products are found, confirm deletion with user
@@ -117,7 +128,12 @@ export function Category() {
 
     const deleteProducts = async (products) => {
         try {
-            const deleteRequests = products.map(productId => axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`));
+            const deleteRequests = products.map(productId => axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            }));
             await Promise.all(deleteRequests);
         } catch (error) {
             console.error('Error deleting products:', error);
@@ -127,7 +143,12 @@ export function Category() {
 
     const deleteCategory = async (catId) => {
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/category/${catId}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/category/${catId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             Swal.fire({
                 icon: 'success',
                 title: 'Success',

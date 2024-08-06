@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
 export function  Addrole() {
+  let authToken = localStorage.getItem('authToken')
   const [roleName, setRoleName] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -49,6 +50,11 @@ const addRole = async () => {
 
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/role`, {
             roleName
+        } ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
         });
 
         if (response.status === 201) {
@@ -74,7 +80,12 @@ const addRole = async () => {
 
 const fetchRole = async (roleId) => {
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role/${roleId}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role/${roleId}` ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
+        });
         setRoleName(response.data.roleName);
       
     } catch (error) {
@@ -87,7 +98,12 @@ const updateRole = async (roleId) => {
         const roledata = {
             roleName
         };
-        const response = await axios.put(`${process.env.REACT_APP_API_URL}/role/${roleId}`, roledata);
+        const response = await axios.put(`${process.env.REACT_APP_API_URL}/role/${roleId}`, roledata ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
+        });
         if (response.status === 200) {
             Swal.fire({
                 icon: 'success',

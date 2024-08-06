@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
 export function AddUser() {
+    let authToken = localStorage.getItem('authToken');
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
@@ -27,7 +28,12 @@ export function AddUser() {
 
     const getRole = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             setRoles(response.data);
         } catch (error) {
             console.error('Error fetching roles:', error);
@@ -36,7 +42,12 @@ export function AddUser() {
 
     const fetchUser = async (userId) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userId}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userId}`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             setFirstname(response.data.firstName);
             setLastname(response.data.lastName);
             setEmail(response.data.email);
@@ -92,12 +103,18 @@ export function AddUser() {
 
     const addUser = async () => {
         try {
+           
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/user`, {
                 firstName: firstname,
                 lastName: lastname,
                 email: email,
                 username: username,
                 roleId: roleId
+            },{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
             });
 
             if (response.status === 201) {
@@ -129,7 +146,12 @@ export function AddUser() {
                 email: email,
                 roleId: roleId
             };
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/user/${userId}`, userdata);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/user/${userId}`, userdata,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',

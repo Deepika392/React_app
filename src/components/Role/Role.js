@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { checkModulePermission } from './../common/api'; 
 
 export function Role() {
+    let authToken = localStorage.getItem('authToken')
     const [roles, setRole] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
@@ -24,7 +25,12 @@ export function Role() {
 
     async function fetchRole() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const totalRoles = response.data.length;
             setTotalPages(Math.ceil(totalRoles / pageSize));
 
@@ -111,10 +117,20 @@ export function Role() {
          
             if (result.isConfirmed) {
                 // Fetch the permissions associated with the role
-                let  permissions = await axios.get(`${process.env.REACT_APP_API_URL}/permission/role/${id}`);
+                let  permissions = await axios.get(`${process.env.REACT_APP_API_URL}/permission/role/${id}`,{
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 // Check if the role is associated with any users
-                let roleDetails  = await axios.get(`${process.env.REACT_APP_API_URL}/user/role/${id}`);
+                let roleDetails  = await axios.get(`${process.env.REACT_APP_API_URL}/user/role/${id}`,{
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
                 if ( roleDetails && roleDetails.data && roleDetails.data.length > 0) {
                     console.log('');
                     Swal.fire(
@@ -131,7 +147,12 @@ export function Role() {
                 }
     
                 // Delete the role
-                await axios.delete(`${process.env.REACT_APP_API_URL}/role/${id}`);
+                await axios.delete(`${process.env.REACT_APP_API_URL}/role/${id}`,{
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
     
                 // Notify the user of success
                 await Swal.fire('Deleted!', 'Your role and associated permissions have been deleted.', 'success');
@@ -148,7 +169,12 @@ export function Role() {
     const deletePermissions = async (permissions) => {
         try {
             //deletePersimsiion bulk
-            const deleteRequests = permissions.map(permissionId => axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`));
+            const deleteRequests = permissions.map(permissionId => axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            }));
             await Promise.all(deleteRequests);
         } catch (error) {
             console.error('Error deletePermissions:', error);

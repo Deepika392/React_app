@@ -4,6 +4,8 @@ import axios from 'axios';
 import { checkDashboardPermission } from './common/api';
 
 export function Dashboard() {
+    let authToken = localStorage.getItem('authToken')
+ 
     const [userCount, setUserCount] = useState(0);
     const [catCount, setCatCount] = useState(0);
     const [productCount, setProductCount] = useState(0);
@@ -39,7 +41,12 @@ export function Dashboard() {
 
     const fetchCount = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/records`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/records`,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const data = response.data;
             setUserCount(data.userCount || 0);
             setCatCount(data.categoryCount || 0);

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { checkModulePermission } from './common/api';
 
 export function User() {
+    let authToken = localStorage.getItem('authToken')
     const [users, setUsers] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
@@ -39,7 +40,12 @@ export function User() {
 
     async function fetchUsers() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const totalUsers = response.data.length;
             setTotalPages(Math.ceil(totalUsers / pageSize));
 
@@ -74,7 +80,12 @@ export function User() {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}`)
+                axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                })
                     .then(response => {
                         Swal.fire(
                             'Deleted!',

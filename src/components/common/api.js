@@ -2,7 +2,14 @@ import axios from 'axios';
 
 export async function getRole() {
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`);
+        let authToken = localStorage.getItem('authToken')
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role` ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
+        }
+        );
         let roles = response.data;
         let roleName = [];
         roles.forEach(role => {
@@ -17,11 +24,17 @@ export async function getRole() {
 
 export async function getPermissionByRole() {
     try {
+        let authToken = localStorage.getItem('authToken')
         let token = localStorage.getItem('token');
         token = JSON.parse(token);
         let userId = token && token.id ? token.id : 0;
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/permissionByRole`,{
             userId : userId
+        } ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
         });
 
         const filteredData = response.data.filter(item => item.rpath !== null && item.rpath !== undefined);
@@ -50,12 +63,19 @@ export async function checkModulePermission(moduleId){
 
 export async function checkDashboardPermission(){
     try{
+        let authToken = localStorage.getItem('authToken')
         let token = localStorage.getItem('token');
         token = JSON.parse(token);
         let userId = token && token.id ? token.id : 0;
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/checkDashboardPermission`,{
             userId : userId,
-        });
+        } ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
+        }
+        );
       return response.data;
     }catch (error) {
         console.error('Error fetching checkModulePermission:', error);

@@ -7,6 +7,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api'; 
 
 export function Permission() {
+    let authToken = localStorage.getItem('authToken')
     const [permissions, setPermission] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE)); // Initialize with environment variable
@@ -35,7 +36,12 @@ export function Permission() {
 
     async function fetchPermission() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/` ,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const totalPermissions = response.data.length;
             setTotalPages(Math.ceil(totalPermissions / pageSize));
             
@@ -72,7 +78,12 @@ export function Permission() {
 
             if (result.isConfirmed) {
 
-                await axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`);
+                await axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}` ,{
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
                 Swal.fire(
                     'Deleted!',
                     'Permission has been deleted.',

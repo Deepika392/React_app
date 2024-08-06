@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
 export function AddCatgegory() {
+    let authToken = localStorage.getItem('authToken')
     const navigate = useNavigate();
     const [catgeoryname, setCatgeoryname] = useState('');
     const [categoryError, setCategoryError] = useState('');
@@ -18,7 +19,12 @@ export function AddCatgegory() {
 
     const fetchCatgeory = async (catId) => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/category/${catId}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/category/${catId}` ,{
+            headers: {
+                'Authorization': `Bearer ${authToken}`, 
+                'Content-Type': 'application/json'
+            }
+        });
           setCatgeoryname(response.data.categoryName);
          
         } catch (error) {
@@ -61,6 +67,11 @@ export function AddCatgegory() {
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/category`, {
                 categoryName: catgeoryname,
+            },{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
             });
             if (response.statusText === "Created") {
                 Swal.fire({
@@ -93,7 +104,12 @@ export function AddCatgegory() {
             const catData = {
                 categoryName: catgeoryname,
             }
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/category/${catId}`, catData);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/category/${catId}`, catData, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             if (response.statusText === "OK") {
                 Swal.fire({
                     icon: 'success',

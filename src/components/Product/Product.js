@@ -7,6 +7,7 @@ import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api';
 
 export function Product() {
+    let authToken = localStorage.getItem('authToken')
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(Number(process.env.REACT_APP_PAGE_SIZE));
@@ -40,7 +41,12 @@ export function Product() {
 
     async function fetchProducts() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/` ,{
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, 
+                    'Content-Type': 'application/json'
+                }
+            });
             const totalProducts = response.data.length;
             setTotalPages(Math.ceil(totalProducts / pageSize));
 
@@ -78,7 +84,12 @@ export function Product() {
             });
 
             if (result.isConfirmed) {
-                await axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`);
+                await axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`,{
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
                 Swal.fire(
                     'Deleted!',
                     'Product has been deleted.',
