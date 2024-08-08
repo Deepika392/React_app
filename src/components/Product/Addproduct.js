@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
+import api from './../utils/api';
 
 export function Addproduct() {
     let authToken = localStorage.getItem('authToken')
@@ -28,12 +29,7 @@ export function Addproduct() {
 
     async function fetchCategory() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/category` ,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.get('/category');
             setOptions(response.data);
         } catch (error) {
             console.error('Error fetching category:', error);
@@ -46,12 +42,7 @@ export function Addproduct() {
 
     const fetchProduct = async (productId) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/${productId}` ,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response =   await api.get(`/product/${productId}`);
             setProductname(response.data.productName);
             setDescription(response.data.description);
             setPrice(response.data.price);
@@ -140,11 +131,10 @@ export function Addproduct() {
             if (image) {
                 formData.append('image', image);
             }
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/product`, formData, {
+
+            const response = await api.post('/product', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                     'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data', 
                 }
             });
             if (response.statusText === "Created") {
@@ -177,6 +167,7 @@ export function Addproduct() {
             if (image) {
                 formData.append('image', image);
             }
+            
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/product/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -184,6 +175,7 @@ export function Addproduct() {
                     'Content-Type': 'application/json'
                 },
             });
+         
             if (response.statusText === "OK") {
                 Swal.fire({
                     icon: 'success',
@@ -203,6 +195,8 @@ export function Addproduct() {
             console.error('Error:', error);
         }
     }
+
+   
 
     return (
         <>

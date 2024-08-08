@@ -24,6 +24,8 @@ export function Header() {
     }, []); 
 	const handleSignout =  () => {
 		 localStorage.removeItem('token'); // Remove token from localStorage
+		 localStorage.removeItem('authToken');
+		 localStorage.removeItem('refreshToken');
 		 localStorage.clear();
 		 
 		 navigate('/');

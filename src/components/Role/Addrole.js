@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
+import api from './../utils/api';
 
 export function  Addrole() {
   let authToken = localStorage.getItem('authToken')
@@ -47,16 +48,9 @@ useEffect(() => {
 const addRole = async () => {
     try {
        
-
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/role`, {
+        const response = await api.post('/role', {
             roleName
-        } ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
         });
-
         if (response.status === 201) {
             Swal.fire({
                 icon: 'success',
@@ -80,12 +74,7 @@ const addRole = async () => {
 
 const fetchRole = async (roleId) => {
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role/${roleId}` ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
-        });
+        const response =   await api.get(`role/${roleId}`);
         setRoleName(response.data.roleName);
       
     } catch (error) {
@@ -98,12 +87,7 @@ const updateRole = async (roleId) => {
         const roledata = {
             roleName
         };
-        const response = await axios.put(`${process.env.REACT_APP_API_URL}/role/${roleId}`, roledata ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
-        });
+        const response =   await api.put(`/role/${roleId}`,roledata);
         if (response.status === 200) {
             Swal.fire({
                 icon: 'success',

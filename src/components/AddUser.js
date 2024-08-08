@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
+import api from './utils/api';
 
 export function AddUser() {
     let authToken = localStorage.getItem('authToken');
@@ -28,12 +29,7 @@ export function AddUser() {
 
     const getRole = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response =   await api.get('/role');
             setRoles(response.data);
         } catch (error) {
             console.error('Error fetching roles:', error);
@@ -42,12 +38,7 @@ export function AddUser() {
 
     const fetchUser = async (userId) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userId}`,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response =   await api.get(`/user/${userId}`);
             setFirstname(response.data.firstName);
             setLastname(response.data.lastName);
             setEmail(response.data.email);
@@ -104,17 +95,12 @@ export function AddUser() {
     const addUser = async () => {
         try {
            
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/user`, {
+            const response = await api.post('/user', {
                 firstName: firstname,
                 lastName: lastname,
                 email: email,
                 username: username,
                 roleId: roleId
-            },{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
             });
 
             if (response.status === 201) {
@@ -146,12 +132,8 @@ export function AddUser() {
                 email: email,
                 roleId: roleId
             };
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/user/${userId}`, userdata,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+
+            const response =   await api.put(`/user/${userId}`,userdata);
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',

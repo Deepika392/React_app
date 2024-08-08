@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api'; 
+import api from './../utils/api'
 
 export function Permission() {
     let authToken = localStorage.getItem('authToken')
@@ -36,12 +37,13 @@ export function Permission() {
 
     async function fetchPermission() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/` ,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            // const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/` ,{
+            //     headers: {
+            //         'Authorization': `Bearer ${authToken}`, 
+            //         'Content-Type': 'application/json'
+            //     }
+            // });
+            const response = await api.get('/permission');
             const totalPermissions = response.data.length;
             setTotalPages(Math.ceil(totalPermissions / pageSize));
             
@@ -105,37 +107,37 @@ export function Permission() {
 
         {
             name: 'Role',
-            selector: 'Role.roleName',
+            selector: row => row.Role.roleName,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.Role.roleName}</div>
         },
         {
             name: 'Module',
-            selector: 'module',
+            selector: row => row.Module.moduleName,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.Module.moduleName}</div>
         },
         {
             name: 'Can Read',
-            selector: 'can_read',
+            selector: row => row.can_read,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.can_read ? 'Yes' : 'No'}</div>
         },
         {
             name: 'Can Write',
-            selector: 'can_write',
+            selector: row => row.can_write,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.can_write ? 'Yes' : 'No'}</div>
         },
         {
             name: 'Can Edit',
-            selector: 'can_edit',
+            selector: row => row.can_edit,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.can_edit ? 'Yes' : 'No'}</div>
         },
         {
             name: 'Can Delete',
-            selector: 'can_delete',
+            selector: row => row.can_delete,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.can_delete ? 'Yes' : 'No'}</div>
         },

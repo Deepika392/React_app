@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
+import api from './../utils/api';
 
 export function AddCatgegory() {
     let authToken = localStorage.getItem('authToken')
@@ -19,12 +20,7 @@ export function AddCatgegory() {
 
     const fetchCatgeory = async (catId) => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/category/${catId}` ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
-        });
+        const response =   await api.get(`/category/${catId}`);
           setCatgeoryname(response.data.categoryName);
          
         } catch (error) {
@@ -65,14 +61,10 @@ export function AddCatgegory() {
     
     async function addCategory() {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/category`, {
+            const response = await api.post('/category', {
                 categoryName: catgeoryname,
-            },{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
             });
+
             if (response.statusText === "Created") {
                 Swal.fire({
                     icon: 'success',
@@ -104,12 +96,8 @@ export function AddCatgegory() {
             const catData = {
                 categoryName: catgeoryname,
             }
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/category/${catId}`, catData, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            
+            const response =   await api.put(`/category/${catId}`,catData);
             if (response.statusText === "OK") {
                 Swal.fire({
                     icon: 'success',

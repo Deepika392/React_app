@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { checkModulePermission } from './../common/api'; 
+import api from './../utils/api';
 
 export function Role() {
     let authToken = localStorage.getItem('authToken')
@@ -25,12 +26,7 @@ export function Role() {
 
     async function fetchRole() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/role`,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.get('/role');
             const totalRoles = response.data.length;
             setTotalPages(Math.ceil(totalRoles / pageSize));
 
@@ -67,7 +63,7 @@ export function Role() {
     const columns = [
         {
             name: 'Role',
-            selector: 'role',
+            selector: row => row.roleName,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.roleName}</div>
         },
@@ -117,20 +113,11 @@ export function Role() {
          
             if (result.isConfirmed) {
                 // Fetch the permissions associated with the role
-                let  permissions = await axios.get(`${process.env.REACT_APP_API_URL}/permission/role/${id}`,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
+                let  permissions = await api.get(`permission/role/${id}`);
 
                 // Check if the role is associated with any users
-                let roleDetails  = await axios.get(`${process.env.REACT_APP_API_URL}/user/role/${id}`,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
+                let  roleDetails = await api.get(`user/role/${id}`);
+
                 if ( roleDetails && roleDetails.data && roleDetails.data.length > 0) {
                     console.log('');
                     Swal.fire(
@@ -147,18 +134,26 @@ export function Role() {
                 }
     
                 // Delete the role
-                await axios.delete(`${process.env.REACT_APP_API_URL}/role/${id}`,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
+                api.delete(`/role/${id}`)
+                .then(response => {
+                    Swal.fire(
+                        'Deleted!',
+                        'Your role and associated permissions have been deleted.',
+                        'success'
+                    );
+                   // Refresh roles after deletion
+                     fetchRole();
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete user.',
+                        'error'
+                    );
                 });
     
-                // Notify the user of success
-                await Swal.fire('Deleted!', 'Your role and associated permissions have been deleted.', 'success');
-    
-                // Refresh roles after deletion
-                fetchRole();
+               
             }
         } catch (error) {
             console.error('Error::', error);
@@ -169,12 +164,9 @@ export function Role() {
     const deletePermissions = async (permissions) => {
         try {
             //deletePersimsiion bulk
-            const deleteRequests = permissions.map(permissionId => axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}`,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            }));
+            const deleteRequests = permissions.map(permissionId =>
+                api.delete(`/permission/${permissionId}`)
+            );
             await Promise.all(deleteRequests);
         } catch (error) {
             console.error('Error deletePermissions:', error);

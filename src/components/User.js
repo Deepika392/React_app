@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { checkModulePermission } from './common/api';
+import api from './utils/api';
 
 export function User() {
     let authToken = localStorage.getItem('authToken')
@@ -40,12 +41,7 @@ export function User() {
 
     async function fetchUsers() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.get('/user');
             const totalUsers = response.data.length;
             setTotalPages(Math.ceil(totalUsers / pageSize));
 
@@ -80,12 +76,7 @@ export function User() {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                })
+                api.delete(`/user/${userId}`)
                     .then(response => {
                         Swal.fire(
                             'Deleted!',
@@ -109,19 +100,19 @@ export function User() {
     const columns = [
         {
             name: 'Role',
-            selector: 'role',
+            selector: row => row.Role.roleName,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.Role.roleName}</div>
         },
         {
             name: 'Name',
-            selector: 'firstName',
+            selector: row => row.firstName,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.firstName} {row.lastName}</div>
         },
         {
             name: 'Email',
-            selector: 'email',
+            selector: row => row.email,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.email}</div>
         },

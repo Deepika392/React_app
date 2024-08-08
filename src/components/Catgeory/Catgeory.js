@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api';
+import api from './../utils/api';
 
 export function Category() {
     let authToken = localStorage.getItem('authToken')
@@ -42,12 +43,9 @@ export function Category() {
     async function fetchCategories() {
      
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/category`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+             
+            const response = await api.get('/category');
+            
             const totalCategories = response.data.length;
             setTotalPages(Math.ceil(totalCategories / pageSize));
 
@@ -82,12 +80,7 @@ export function Category() {
 
             if (result.isConfirmed) {
                 // Check if there are products associated with this category
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/category/${catId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await api.get(`/product/category/${catId}`);
 
                 if (response.data.length > 0) {
                     // If products are found, confirm deletion with user
@@ -128,12 +121,9 @@ export function Category() {
 
     const deleteProducts = async (products) => {
         try {
-            const deleteRequests = products.map(productId => axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            }));
+            const deleteRequests = products.map(productId =>
+                api.delete(`/product/${productId}`)
+            );
             await Promise.all(deleteRequests);
         } catch (error) {
             console.error('Error deleting products:', error);
@@ -143,20 +133,24 @@ export function Category() {
 
     const deleteCategory = async (catId) => {
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/category/${catId}`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Category deleted successfully',
-            }).then(() => {
-                // Fetch updated category list or perform any necessary action
-                fetchCategories();
-            });
+                api.delete(`/category/${catId}`)
+                    .then(response => {
+                        Swal.fire(
+                            'Deleted!',
+                            'Category has been deleted.',
+                            'success'
+                        );
+                        fetchCategories();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting Category:', error);
+                        Swal.fire(
+                            'Error!',
+                            'Failed to delete Category.',
+                            'error'
+                        );
+                    });
+          
         } catch (error) {
             console.error('Error deleting category:', error);
             Swal.fire({
@@ -170,7 +164,7 @@ export function Category() {
     const columns = [
         {
             name: 'Category Name',
-            selector: 'categoryName',
+            selector: row => row.categoryName, 
             sortable: false,
             cell: row => <div className="text-gray-600">{row.categoryName}</div>
         },

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { checkModulePermission } from './../common/api';
+import api from './../utils/api';
 
 export function Product() {
     let authToken = localStorage.getItem('authToken')
@@ -41,12 +42,7 @@ export function Product() {
 
     async function fetchProducts() {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/` ,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.get('/product');
             const totalProducts = response.data.length;
             setTotalPages(Math.ceil(totalProducts / pageSize));
 
@@ -84,18 +80,23 @@ export function Product() {
             });
 
             if (result.isConfirmed) {
-                await axios.delete(`${process.env.REACT_APP_API_URL}/product/${productId}`,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
-                Swal.fire(
-                    'Deleted!',
-                    'Product has been deleted.',
-                    'success'
-                );
-                fetchProducts(); // Refresh products after deletion
+                api.delete(`/product/${productId}`)
+                    .then(response => {
+                        Swal.fire(
+                            'Deleted!',
+                            'Product has been deleted.',
+                            'success'
+                        );
+                        fetchProducts(); // Fetch updated users after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error deleting Product:', error);
+                        Swal.fire(
+                            'Error!',
+                            'Failed to delete Product.',
+                            'error'
+                        );
+                    });
             }
         } catch (error) {
             console.error('Error deleting product:', error);
@@ -110,7 +111,7 @@ export function Product() {
     const columns = [
         {
             name: 'Image',
-            selector: 'image',
+            selector: row => row.image,
             sortable: false,
             cell: row => (
                 <div className="text-gray-600">
@@ -130,27 +131,29 @@ export function Product() {
                 </div>
             )
         },
+
+
         {
             name: 'Category',
-            selector: 'Category.categoryName',
+            selector: row => row.Category.categoryName, 
             sortable: false,
             cell: row => <div className="text-gray-600">{row.Category.categoryName}</div>
         },
         {
             name: 'Product Name',
-            selector: 'productName',
+            selector: row => row.productName, 
             sortable: false,
             cell: row => <div className="text-gray-600">{row.productName}</div>
         },
         {
             name: 'Description',
-            selector: 'description',
+            selector: row => row.description,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.description}</div>
         },
         {
             name: 'Price',
-            selector: 'price',
+            selector: row => row.price,
             sortable: false,
             cell: row => <div className="text-gray-600">{row.price}</div>
         },
@@ -235,3 +238,4 @@ export function Product() {
         </div>
     );
 }
+

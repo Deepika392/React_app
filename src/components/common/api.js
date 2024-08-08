@@ -1,15 +1,11 @@
 import axios from 'axios';
+import api from './../utils/api';
 
 export async function getRole() {
     try {
         let authToken = localStorage.getItem('authToken')
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/role` ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
-        }
-        );
+        const response = await api.get('/role');
+
         let roles = response.data;
         let roleName = [];
         roles.forEach(role => {
@@ -30,11 +26,6 @@ export async function getPermissionByRole() {
         let userId = token && token.id ? token.id : 0;
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/permissionByRole`,{
             userId : userId
-        } ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
         });
 
         const filteredData = response.data.filter(item => item.rpath !== null && item.rpath !== undefined);
@@ -67,15 +58,9 @@ export async function checkDashboardPermission(){
         let token = localStorage.getItem('token');
         token = JSON.parse(token);
         let userId = token && token.id ? token.id : 0;
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/checkDashboardPermission`,{
+        const response = await api.post('/checkDashboardPermission', {
             userId : userId,
-        } ,{
-            headers: {
-                'Authorization': `Bearer ${authToken}`, 
-                'Content-Type': 'application/json'
-            }
-        }
-        );
+        });
       return response.data;
     }catch (error) {
         console.error('Error fetching checkModulePermission:', error);

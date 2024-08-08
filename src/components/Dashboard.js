@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { checkDashboardPermission } from './common/api';
+import api from './utils/api';
 
 export function Dashboard() {
     let authToken = localStorage.getItem('authToken')
@@ -21,7 +22,6 @@ export function Dashboard() {
             try {
                 // Check dashboard permissions
                 const permissionData = await checkDashboardPermission();
-                console.log('Permission Data:', permissionData);
 
                 // Set permissions based on fetched data
                 setUser(permissionData.some(p => p.moduleName === 'User' && p.can_read === 1));
@@ -41,12 +41,7 @@ export function Dashboard() {
 
     const fetchCount = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/records`,{
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, 
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.get('/records');
             const data = response.data;
             setUserCount(data.userCount || 0);
             setCatCount(data.categoryCount || 0);

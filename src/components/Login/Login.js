@@ -49,15 +49,15 @@ export function Login() {
           password
         });
 
-
         let token = response.data;
-       
         
         token.refresh = false;
-        let authToken =  response.data.token 
-        
+        let authToken =  response.data.token ;
+        let refreshToken = response.data.refreshToken;
+
         localStorage.setItem('token', JSON.stringify(token));
         localStorage.setItem('authToken', authToken);
+        localStorage.setItem('refreshToken', refreshToken);
         
         navigate('/dashboard');
 
