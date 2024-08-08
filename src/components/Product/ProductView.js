@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from './../utils/api';
 
 export function ProductView() {
     let authToken = localStorage.getItem('authToken')
@@ -12,12 +13,7 @@ export function ProductView() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/product/${productId}`,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await api.get(`/product/${productId}`);
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);

@@ -37,12 +37,7 @@ export function Permission() {
 
     async function fetchPermission() {
         try {
-            // const response = await axios.get(`${process.env.REACT_APP_API_URL}/permission/` ,{
-            //     headers: {
-            //         'Authorization': `Bearer ${authToken}`, 
-            //         'Content-Type': 'application/json'
-            //     }
-            // });
+          
             const response = await api.get('/permission');
             const totalPermissions = response.data.length;
             setTotalPages(Math.ceil(totalPermissions / pageSize));
@@ -79,19 +74,23 @@ export function Permission() {
             });
 
             if (result.isConfirmed) {
-
-                await axios.delete(`${process.env.REACT_APP_API_URL}/permission/${permissionId}` ,{
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`, 
-                        'Content-Type': 'application/json'
-                    }
-                });
-                Swal.fire(
-                    'Deleted!',
-                    'Permission has been deleted.',
-                    'success'
-                );
-                fetchPermission(); // Refresh products after deletion
+                api.delete(`/permission/${permissionId}`)
+                    .then(response => {
+                        Swal.fire(
+                            'Deleted!',
+                            'Permission has been deleted.',
+                            'success'
+                        );
+                        fetchPermission(); 
+                    })
+                    .catch(error => {
+                        console.error('Error deleting user:', error);
+                        Swal.fire(
+                            'Error!',
+                            'Failed to delete Permission.',
+                            'error'
+                        );
+                    });
             }
         } catch (error) {
             console.error('Error deleting permission:', error);

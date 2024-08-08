@@ -159,6 +159,7 @@ export function Addproduct() {
 
     async function updateProduct(productId) {
         try {
+
             const formData = new FormData();
             formData.append('productName', productname);
             formData.append('description', description);
@@ -167,6 +168,7 @@ export function Addproduct() {
             if (image) {
                 formData.append('image', image);
             }
+
             
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/product/${productId}`, formData, {
                 headers: {
@@ -175,6 +177,9 @@ export function Addproduct() {
                     'Content-Type': 'application/json'
                 },
             });
+
+         
+            
          
             if (response.statusText === "OK") {
                 Swal.fire({
@@ -195,8 +200,6 @@ export function Addproduct() {
             console.error('Error:', error);
         }
     }
-
-   
 
     return (
         <>
